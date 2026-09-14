@@ -71,15 +71,13 @@ class ThresholdInstantConstraint : public Constraint
   /*******************************************************************
   Constructor / Destructor
   ********************************************************************/
-  ThresholdInstantConstraint (const T & var)
+  explicit ThresholdInstantConstraint (const T & var)
     :
     Constraint(NumThresholds),
     variable(var),
     tests()
   {
-    for (auto & test : tests) {
-      test_list.push_back(&test);
-    }
+    register_tests(tests);
   }
   ThresholdInstantConstraint (const T & var,
                               ConstraintSet & set)
@@ -89,6 +87,8 @@ class ThresholdInstantConstraint : public Constraint
     set.constraints.push_back(this);
   }
   ~ThresholdInstantConstraint() override = default;
+  ThresholdInstantConstraint( const ThresholdInstantConstraint &) = delete;
+  ThresholdInstantConstraint & operator=( const ThresholdInstantConstraint &) = delete;
 
   /***************************************************************************
   * Inherited -  initialize
@@ -107,10 +107,6 @@ class ThresholdInstantConstraint : public Constraint
     }
     post_update(); // inherited.
   }
-
- private: // not implemented; not copyable
-  ThresholdInstantConstraint( const ThresholdInstantConstraint &);
-  ThresholdInstantConstraint & operator=( const ThresholdInstantConstraint &);
 };
 
 
@@ -172,21 +168,21 @@ class ThresholdTimedConstraint : public Constraint
     delta_time(delta_time_),
     tests()
   {
-    for (auto & test : tests) {
-      test_list.push_back(&test);
-    }
+    register_tests(tests);
   }
   /********************************************************************/
-  ThresholdTimedConstraint (const T & variable,
-                            const double & delta_time,
+  ThresholdTimedConstraint (const T & variable_,
+                            const double & delta_time_,
                             ConstraintSet & set)
     :
-    ThresholdTimedConstraint (variable,
-                              delta_time)
+    ThresholdTimedConstraint (variable_,
+                              delta_time_)
   {
     set.constraints.push_back(this);
   }
   ~ThresholdTimedConstraint() override = default;
+  ThresholdTimedConstraint( const ThresholdTimedConstraint &) = delete;
+  ThresholdTimedConstraint & operator=( const ThresholdTimedConstraint &) = delete;
 
   /***************************************************************************
   * Inherited -  initialize
@@ -206,10 +202,6 @@ class ThresholdTimedConstraint : public Constraint
     }
     post_update(); // inherited.
   }
-
- private: // not implemented; not copyable
-  ThresholdTimedConstraint( const ThresholdTimedConstraint &);
-  ThresholdTimedConstraint & operator=( const ThresholdTimedConstraint &);
 };
 
 
@@ -315,20 +307,21 @@ class ThresholdTimedConstraintSpecData : public Constraint
     use_linear_interpolation(true),
     test_violation_value()
   {
-    for (auto & test : tests) {
-      test_list.push_back(&test);
-    }
+    register_tests(tests);
   }
-  ThresholdTimedConstraintSpecData (const T & variable,
-                                    const double & delta_time,
+  ThresholdTimedConstraintSpecData (const T & variable_,
+                                    const double & delta_time_,
                                     ConstraintSet & set)
     :
-    ThresholdTimedConstraintSpecData (variable,
-                                      delta_time)
+    ThresholdTimedConstraintSpecData (variable_,
+                                      delta_time_)
   {
     set.constraints.push_back(this);
   }
   ~ThresholdTimedConstraintSpecData() override = default;
+  ThresholdTimedConstraintSpecData( const ThresholdTimedConstraintSpecData &) = delete;
+  ThresholdTimedConstraintSpecData & operator=(
+                                     const ThresholdTimedConstraintSpecData &) = delete;
 
   /***************************************************************************
   Name: set_num_specs
@@ -473,7 +466,7 @@ class ThresholdTimedConstraintSpecData : public Constraint
     double threshold_resolution =
          (threshold_spec[num_specs-1] - threshold_spec[0])*1.0 / (num_tests-1);
     for (size_t ii = 1; ii <= num_tests-2; ++ii) {
-      tests[ii].threshold = threshold_spec[0] + ii * threshold_resolution;
+      tests[ii].threshold = threshold_spec[0] + static_cast<double>(ii) * threshold_resolution;
     }
 
     /* Set the test threshold values for the time.
@@ -522,10 +515,6 @@ class ThresholdTimedConstraintSpecData : public Constraint
       mapped_ix[test_ix] = spec_ix;
     }
 
-
-    // The fraction -- and the way it is used -- differs between algorithms.
-    double frac = 0.0; // fraction of interval between spec values
-
     if (use_linear_interpolation) {
       /* t = t_0 + f * (t_1 - t_0)
          with f = (x - x_0) / (x_1 - x_0)
@@ -537,8 +526,8 @@ class ThresholdTimedConstraintSpecData : public Constraint
          - the non-subscripted values are the test values.*/
       for (size_t test_ix = 1; test_ix <= num_tests-2; ++test_ix) {
         size_t map_ix = mapped_ix[test_ix];
-        frac = (tests[test_ix].threshold - threshold_spec[map_ix]) /
-            (threshold_spec[map_ix+1] -  threshold_spec[map_ix]);
+        const double frac = (tests[test_ix].threshold - threshold_spec[map_ix]) /
+                            (threshold_spec[map_ix+1] -  threshold_spec[map_ix]);
         tests[test_ix].time_limit = time_spec[map_ix] +
           frac * (time_spec[map_ix+1] -  time_spec[map_ix]);
       }
@@ -588,8 +577,8 @@ class ThresholdTimedConstraintSpecData : public Constraint
         // Note -- div-0 protected: log_param_ratios=0 would require two
         // adjacent entries in threshold_spec to be equal. That is protected
         // against by ensuring that threshold_spec must be monotonic.
-        frac = std::log10( tests[test_ix].threshold / threshold_spec[map_ix]) /
-                    log_threshold_ratios[map_ix];
+        const double frac = std::log10( tests[test_ix].threshold / threshold_spec[map_ix]) /
+                                        log_threshold_ratios[map_ix];
         tests[test_ix].time_limit = time_spec[map_ix] *
                                   std::pow( time_spec[map_ix+1] / time_spec[map_ix],
                                             frac);
@@ -612,10 +601,5 @@ class ThresholdTimedConstraintSpecData : public Constraint
     }
     post_update(); // inherited.
   }
-
- private: // not implemented; not copyable
-  ThresholdTimedConstraintSpecData( const ThresholdTimedConstraintSpecData &);
-  ThresholdTimedConstraintSpecData & operator=(
-                                     const ThresholdTimedConstraintSpecData &);
 };
 #endif

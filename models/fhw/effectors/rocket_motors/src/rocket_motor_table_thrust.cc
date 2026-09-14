@@ -37,7 +37,7 @@ RocketMotor_TableThrust::RocketMotor_TableThrust(
     DynamicMassBodyPropertiesInterface & mass_properties,
     const double                       & time,
     const double                       * veh_cm_in,
-    bool                                 use_mass_string_in)
+    const bool                           use_mass_string_in)
   :
   RocketMotor_Basic( mass_group_in,
                      mass_body,
@@ -46,19 +46,11 @@ RocketMotor_TableThrust::RocketMotor_TableThrust(
                      time,
                      veh_cm_in,
                      use_mass_string_in),
-  thrust_fraction(0.0),
-  thrust_max(0.0),
   thrust_table(thrust_magnitude),
   isp_table(isp),
   mdot_table(mass_flow_rate),
   mburn_table(mburn),
-  table_time(elapsed_time),
-  isp(0.0),
-  mburn(0.0),
-  delta_mass(0.0),
-  elapsed_time(0.0),
-  consumption_type(Undefined),
-  prop_mass_init(0.0)
+  table_time(elapsed_time)
 {
   table_set.add_independent_variable(table_time);
   table_set.add_table(thrust_table);
@@ -176,9 +168,7 @@ RocketMotor_TableThrust::load_isp_data(
     double * data,
     size_t   num_elements)
 {
-  std::vector<size_t> sizes;
-  sizes.push_back(1);
-  sizes.push_back( num_elements);
+  const std::vector<size_t> sizes {1, num_elements};
   // non-terminal NULL check in load_data, but returns false if NULL
   if (isp_table.load_data( data, sizes)) {
     // check minimum value.
@@ -200,9 +190,7 @@ void
 RocketMotor_TableThrust::load_isp_data(
     std::vector<double> & data)
 {
-  std::vector<size_t> sizes;
-  sizes.push_back(1);
-  sizes.push_back( data.size());
+  const std::vector<size_t> sizes {1, data.size()};
   if (isp_table.load_data( data, sizes)) {
     // check minimum value.
     double min_value = data[0];
@@ -224,9 +212,7 @@ RocketMotor_TableThrust::load_mdot_data(
     double * data,
     size_t   num_elements)
 {
-  std::vector<size_t> sizes;
-  sizes.push_back(1);
-  sizes.push_back( num_elements);
+  const std::vector<size_t> sizes {1, num_elements};
   mdot_table.load_data( data, sizes);// non-terminal NULL check in load_data
 }
 
@@ -235,9 +221,7 @@ void
 RocketMotor_TableThrust::load_mdot_data(
     std::vector<double> & data)
 {
-  std::vector<size_t> sizes;
-  sizes.push_back(1);
-  sizes.push_back( data.size());
+  const std::vector<size_t> sizes {1, data.size()};
   mdot_table.load_data( data, sizes);
 }
 
@@ -247,9 +231,7 @@ RocketMotor_TableThrust::load_mburn_data(
     double * data,
     size_t   num_elements)
 {
-  std::vector<size_t> sizes;
-  sizes.push_back(1);
-  sizes.push_back( num_elements);
+  const std::vector<size_t> sizes {1, num_elements};
   mburn_table.load_data( data, sizes);// non-terminal NULL check in load_data
 }
 
@@ -258,9 +240,7 @@ void
 RocketMotor_TableThrust::load_mburn_data(
     std::vector<double> & data)
 {
-  std::vector<size_t> sizes;
-  sizes.push_back(1);
-  sizes.push_back( data.size());
+  const std::vector<size_t> sizes {1, data.size()};
   mburn_table.load_data( data, sizes);
 }
 

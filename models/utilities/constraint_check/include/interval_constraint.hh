@@ -51,15 +51,13 @@ class IntervalInstantConstraint : public Constraint
   /*******************************************************************
   Constructor / Destructor
   ********************************************************************/
-  IntervalInstantConstraint (const T & var)
+  explicit IntervalInstantConstraint (const T & var)
     :
     Constraint(NumIntervals),
     variable(var),
     tests()
   {
-    for (auto & test : tests) {
-      test_list.push_back(&test);
-    }
+    register_tests(tests);
   }
   /*******************************************************************/
   IntervalInstantConstraint (const T & var,
@@ -70,6 +68,8 @@ class IntervalInstantConstraint : public Constraint
     set.constraints.push_back(this);
   }
   ~IntervalInstantConstraint() override = default;
+  IntervalInstantConstraint( const IntervalInstantConstraint &) = delete;
+  IntervalInstantConstraint & operator=( const IntervalInstantConstraint &) = delete;
 
   /***************************************************************************
   * Name: initialize
@@ -106,10 +106,6 @@ class IntervalInstantConstraint : public Constraint
     }
     post_update(); // inherited.
   }
-
- private: // not implemented; not copyable
-  IntervalInstantConstraint( const IntervalInstantConstraint &);
-  IntervalInstantConstraint & operator=( const IntervalInstantConstraint &);
 };
 
 
@@ -156,22 +152,22 @@ class IntervalTimedConstraint : public Constraint
     delta_time(delta_time_),
     tests()
   {
-    for (auto & test : tests) {
-      test_list.push_back(&test);
-    }
+    register_tests(tests);
   }
   /*******************************************************************/
-  IntervalTimedConstraint (const T & variable,
-                           const double & delta_time,
+  IntervalTimedConstraint (const T & variable_,
+                           const double & delta_time_,
                            ConstraintSet & set)
     :
-    IntervalTimedConstraint (variable,
-                             delta_time)
+    IntervalTimedConstraint (variable_,
+                             delta_time_)
   {
     set.constraints.push_back(this);
   }
 
   ~IntervalTimedConstraint() override = default;
+  IntervalTimedConstraint( const IntervalTimedConstraint &) = delete;
+  IntervalTimedConstraint & operator=( const IntervalTimedConstraint &) = delete;
 
   /***************************************************************************
   * Name: initialize
@@ -208,9 +204,5 @@ class IntervalTimedConstraint : public Constraint
     }
     post_update(); // inherited.
   }
-
- private: // not implemented; not copyable
-  IntervalTimedConstraint( const IntervalTimedConstraint &);
-  IntervalTimedConstraint & operator=( const IntervalTimedConstraint &);
 };
 #endif
