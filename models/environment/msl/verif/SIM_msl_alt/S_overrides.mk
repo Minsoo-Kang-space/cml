@@ -1,1 +1,1 @@
-include ${SIMULATION_ROOT}/mkspecs/cml.mk
+include ${CML_HOME}/mkspecs/internal/cml_unit_sim.mk

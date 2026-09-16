@@ -26,27 +26,26 @@ Purpose:(Provides an altitude based on the MSL.)
 class MslAlt : public SubscriptionBase
 {
  protected: // External references
-   double & geodLat; /* (rad) Geodetic latitude  */
-   double & geodLon; /* (rad) Geodetic longitude */
-   double & geodAlt; /* (m)   Geodetic altitude  */
+   double & geod_lat; /* (rad) Geodetic latitude  */
+   double & geod_lon; /* (rad) Geodetic longitude */
+   double & geod_alt; /* (m)   Geodetic altitude  */
 
  public:
-   static const int latSize = 181; /* (--)
+   static constexpr int lat_size = 181; /* (--)
                                 Array size for latitude for look up table */
-   static const int lonSize = 361; /* (--)
+   static constexpr int lon_size = 361; /* (--)
                                 Array size for longitude for look up table */
 
-   static const double   table[latSize][lonSize]; /* (m)
+   static const double   table[lat_size][lon_size]; /* (m)
                                 Geoid vs. MSL error lookup table  */
-   double   mslAltitude{0.0}; /* (m) Altitude with respect to mean sea level */
+   double   msl_alt{0.0}; /* (m) Altitude with respect to mean sea level */
 
  protected:
-   static const double      rad_per_deg; /* (rad/degree) unit converter.*/
-   double                   altFromTable{0.0};  /* (m) Altitude from the table */
-   GenericMultiInputTable   mslTable; /* (--) Mean sea level height table */
-   TableLookupSet           tableSet; /* (--) Interpolation table manager */
-   TableIndependentVariable tableLat; /* (--) Lookup table latitude */
-   TableIndependentVariable tableLon; /* (--) Lookup table longitude */
+   double                   alt_from_table{0.0};  /* (m) Altitude from the table */
+   GenericMultiInputTable   msl_table; /* (--) Mean sea level height table */
+   TableLookupSet           table_set; /* (--) Interpolation table manager */
+   TableIndependentVariable table_lat; /* (--) Lookup table latitude */
+   TableIndependentVariable table_lon; /* (--) Lookup table longitude */
 
  public:
    /*Constructor/Destructor*/

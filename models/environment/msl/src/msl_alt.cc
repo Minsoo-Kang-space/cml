@@ -27,12 +27,12 @@ MslAlt::MslAlt(double &geod_alt_in,
    double &geod_lat_in,
    double &geod_lon_in)
    :
-   geodLat(geod_lat_in),
-   geodLon(geod_lon_in),
-   geodAlt(geod_alt_in),
-   mslTable(altFromTable),
-   tableLat(geodLat),
-   tableLon(geodLon, TableIndependentVariable::WrapAround)
+   geod_lat(geod_lat_in),
+   geod_lon(geod_lon_in),
+   geod_alt(geod_alt_in),
+   msl_table(alt_from_table),
+   table_lat(geod_lat),
+   table_lon(geod_lon, TableIndependentVariable::WrapAround)
 {
    subscribe_name = "Mean Sea Level Altitude:";
 }
@@ -45,35 +45,37 @@ void MslAlt::initialize()
 {
    if (!enabled) { return; }
 
-   double scratchLat[latSize] = {0.0};
-   for(int ii =0; ii<latSize; ++ii)
-   {
-      scratchLat[ii] = (ii-90.0) * rad_per_deg;
-   }
-   tableLat.load_data(scratchLat, latSize);
+   constexpr double DEG_TO_RAD = 1.0 / 57.29577951308231;
 
-   double scratchLon[lonSize] = {0.0};
-   for(int ii =0; ii<lonSize; ++ii)
+   double scratch_lat[lat_size] = {0.0};
+   for(int ii =0; ii<lat_size; ++ii)
    {
-      scratchLon[ii] = ii * rad_per_deg;
+      scratch_lat[ii] = (ii-90.0) * DEG_TO_RAD;
    }
-   tableLon.load_data(scratchLon, lonSize);
+   table_lat.load_data(scratch_lat, lat_size);
+
+   double scratch_lon[lon_size] = {0.0};
+   for(int ii =0; ii<lon_size; ++ii)
+   {
+      scratch_lon[ii] = ii * DEG_TO_RAD;
+   }
+   table_lon.load_data(scratch_lon, lon_size);
 
    // table-data is provided in the msl_alt_dd.cc file, which populates the
    // table[latSize][lonSize] array.
-   const std::vector<std::size_t> size_vec{1, latSize, lonSize};
-   mslTable.load_data(&table[0][0], size_vec );
-   tableSet.add_table(mslTable);
+   const std::vector<std::size_t> size_vec{1, lat_size, lon_size};
+   msl_table.load_data(&table[0][0], size_vec );
+   table_set.add_table(msl_table);
 
-   tableSet.add_independent_variable(tableLat);
-   tableSet.associate_table_and_independent();
+   table_set.add_independent_variable(table_lat);
+   table_set.associate_table_and_independent();
 
-   tableSet.add_independent_variable(tableLon);
-   tableSet.associate_table_and_independent();
+   table_set.add_independent_variable(table_lon);
+   table_set.associate_table_and_independent();
 
-   tableSet.initialize();
+   table_set.initialize();
    SubscriptionBase::initialize();
-   tableSet.subscribe();
+   table_set.subscribe();
    update();
 }
 
@@ -86,6 +88,6 @@ void  MslAlt::update()
    //if the MSL is not active, get out of here
    if (!active) { return; }
 
-   tableSet.update();
-   mslAltitude = geodAlt - altFromTable;
+   table_set.update();
+   msl_alt = geod_alt - alt_from_table;
 }
