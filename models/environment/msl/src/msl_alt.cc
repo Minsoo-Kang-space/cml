@@ -15,7 +15,6 @@ PROGRAMMERS:
 *******************************************************************************/
 #include "../include/msl_alt.hh"
 
-#include <cmath>
 #include <cstddef>
 #include <vector>
 
