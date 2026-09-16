@@ -38,7 +38,7 @@ class MslAlt : public SubscriptionBase
 
    static const double   table[lat_size][lon_size]; /* (m)
                                 Geoid vs. MSL error lookup table  */
-   double   msl_alt{0.0}; /* (m) Altitude with respect to mean sea level */
+   double   msl_altitude{0.0}; /* (m) Altitude with respect to mean sea level */
 
  protected:
    double                   alt_from_table{0.0};  /* (m) Altitude from the table */
@@ -53,8 +53,8 @@ class MslAlt : public SubscriptionBase
           double &geod_lat_in,
           double &geod_lon_in);
 
-   MslAlt (const MslAlt&) = delete;
-   MslAlt& operator = (const MslAlt&) = delete;
+   MslAlt(const MslAlt&) = delete;
+   MslAlt& operator=(const MslAlt&) = delete;
    
    /*Methods*/
    void initialize() override;

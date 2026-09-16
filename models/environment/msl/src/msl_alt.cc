@@ -13,11 +13,12 @@ PROGRAMMERS:
     ((R. Borland) (NASA) (Nov 2019) (C++ Implementation for ANTARES))
    )
 *******************************************************************************/
+#include "../include/msl_alt.hh"
 
+#include <cmath>
 #include <cstddef>
 #include <vector>
 
-#include "../include/msl_alt.hh"
 #include "cml/models/utilities/subscriptions/include/subscriptions.hh"
 
 /*****************************************************************************
@@ -45,24 +46,24 @@ void MslAlt::initialize()
 {
    if (!enabled) { return; }
 
-   constexpr double DEG_TO_RAD = 1.0 / 57.29577951308231;
+   constexpr double deg_to_rad = 1.0 / 57.29577951308231;
 
    double scratch_lat[lat_size] = {0.0};
-   for(int ii =0; ii<lat_size; ++ii)
+   for(int ii = 0; ii < lat_size; ++ii)
    {
-      scratch_lat[ii] = (ii-90.0) * DEG_TO_RAD;
+      scratch_lat[ii] = (ii-90.0) * deg_to_rad;
    }
    table_lat.load_data(scratch_lat, lat_size);
 
    double scratch_lon[lon_size] = {0.0};
-   for(int ii =0; ii<lon_size; ++ii)
+   for(int ii = 0; ii < lon_size; ++ii)
    {
-      scratch_lon[ii] = ii * DEG_TO_RAD;
+      scratch_lon[ii] = ii * deg_to_rad;
    }
    table_lon.load_data(scratch_lon, lon_size);
 
    // table-data is provided in the msl_alt_dd.cc file, which populates the
-   // table[latSize][lonSize] array.
+   // table[lat_size][lon_size] array.
    const std::vector<std::size_t> size_vec{1, lat_size, lon_size};
    msl_table.load_data(&table[0][0], size_vec );
    table_set.add_table(msl_table);
@@ -89,5 +90,5 @@ void  MslAlt::update()
    if (!active) { return; }
 
    table_set.update();
-   msl_alt = geod_alt - alt_from_table;
+   msl_altitude = geod_alt - alt_from_table;
 }
